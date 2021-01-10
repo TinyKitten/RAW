@@ -14,11 +14,13 @@ export default async (
     const note = await db.collection('notes').findOne({
       _id: req.query.id,
     });
-    res.statusCode = 200;
     if (isJson(note.content)) {
+      res.statusCode = 200;
       res.json(note.content);
     } else {
-      res.send(note.content);
+      res.writeHead(200, { 'Content-Type': 'text/plain;charset=UTF-8' });
+      res.write(note.content);
+      res.end();
     }
   } catch (err) {
     res.statusCode = 500;
