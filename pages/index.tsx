@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react';
-import styles from '../styles/Home.module.css';
 import fetch from 'unfetch';
 import { NoteBody } from './api/notes';
 import useRandomId from '../hooks/randomId';
@@ -34,7 +33,7 @@ export default function Home(): React.ReactElement {
   );
 
   return (
-    <div className={styles.container}>
+    <div>
       {wrote && (
         <b>
           Your Path:{' '}
