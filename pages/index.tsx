@@ -35,14 +35,18 @@ export default function Home(): React.ReactElement {
   return (
     <div>
       {wrote && (
-        <b>
+        <p style={{ fontWeight: 'bold' }}>
           Your Path:{' '}
           <a target="_blank" rel="noreferrer" href={`/api/raw/${_id}`}>
             /api/raw/{_id}
           </a>
-        </b>
+        </p>
       )}
-      {hasError && <b style={{ color: 'crimson' }}>An error occurred!</b>}
+      {hasError && (
+        <p style={{ fontWeight: 'bold', color: 'crimson' }}>
+          An error occurred!
+        </p>
+      )}
       <form onSubmit={handleSubmit}>
         <textarea
           style={{ display: 'block' }}

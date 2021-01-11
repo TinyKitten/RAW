@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { connectToDatabase } from '../../../utils/mongodb';
 
 type NoteFetchError = {
-  error: string;
+  error: number;
 };
 
 export default async (
@@ -14,6 +14,13 @@ export default async (
     const note = await db.collection('notes').findOne({
       _id: req.query.id,
     });
+    if (!note) {
+      res.statusCode = 404;
+      res.json({
+        error: 404,
+      });
+      return;
+    }
     if (isJson(note.content)) {
       res.statusCode = 200;
       res.json(note.content);
