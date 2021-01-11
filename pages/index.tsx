@@ -58,8 +58,22 @@ export default function Home(): React.ReactElement {
       </form>
       <p>
         Created by:{' '}
-        <a href="https://tinykitten.me/" target="_blank" rel="noreferrer">
+        <a
+          style={{ color: '#008ffe' }}
+          href="https://tinykitten.me/"
+          target="_blank"
+          rel="noreferrer"
+        >
           TinyKitten
+        </a>
+      </p>
+      <p>
+        <a
+          href="https://github.com/TinyKitten/RAW"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Fork me on GitHub
         </a>
       </p>
     </div>
