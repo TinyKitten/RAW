@@ -20,7 +20,7 @@ export default async (
       const { db } = await connectToDatabase();
       const bodyJson = {
         ...JSON.parse(req.body),
-        ip: req.socket.remoteAddress,
+        ip: req.headers['x-forwarded-for'],
       };
       const existsDoc = await db.collection('notes').findOne({
         _id: bodyJson._id,
