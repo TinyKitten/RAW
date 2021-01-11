@@ -5,6 +5,7 @@ import { connectToDatabase } from '../../../utils/mongodb';
 export type NoteBody = {
   _id: string;
   content: string;
+  ip?: string;
 };
 type NoteCreateError = {
   error: string;
@@ -17,15 +18,18 @@ export default async (
   if (req.method === 'POST') {
     try {
       const { db } = await connectToDatabase();
-      const reqJson = JSON.parse(req.body);
+      const bodyJson = {
+        ...JSON.parse(req.body),
+        ip: req.socket.remoteAddress,
+      };
       const existsDoc = await db.collection('notes').findOne({
-        _id: reqJson._id,
+        _id: bodyJson._id,
       });
       if (existsDoc) {
-        await updateNoteAsync(reqJson, db);
+        await updateNoteAsync(bodyJson, db);
         res.statusCode = 200;
       } else {
-        await insertNoteAsync(reqJson, db);
+        await insertNoteAsync(bodyJson, db);
         res.statusCode = 201;
       }
       return res.end();
