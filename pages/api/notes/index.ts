@@ -1,75 +1,25 @@
-import { Db } from 'mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '../../../utils/mongodb';
+import { NoteBody } from '../../../models/NoteBody';
+import { getRedisClient } from '../../../utils/redis';
 
-export type NoteBody = {
-  _id: string;
-  content: string;
-  ip?: string;
-};
 type NoteCreateError = {
   error: string;
 };
 
-export default async (
+export default (
   req: NextApiRequest,
   res: NextApiResponse<NoteCreateError>
-): Promise<void> => {
+): void => {
   if (req.method === 'POST') {
-    try {
-      const { db } = await connectToDatabase();
-      const bodyJson = {
-        ...JSON.parse(req.body),
-        ip: req.headers['x-forwarded-for'],
-      };
-      const existsDoc = await db.collection('notes').findOne({
-        _id: bodyJson._id,
-      });
-      if (existsDoc) {
-        await updateNoteAsync(bodyJson, db);
-        res.statusCode = 200;
-      } else {
-        await insertNoteAsync(bodyJson, db);
-        res.statusCode = 201;
+    const client = getRedisClient();
+    const bodyJson = JSON.parse(req.body) as NoteBody;
+    client.set(bodyJson.id, bodyJson.content, (err) => {
+      if (err) {
+        res.statusCode = 500;
+        return res.end();
       }
-      return res.end();
-    } catch (err) {
-      res.statusCode = 500;
-      return res.json({
-        error: err,
-      });
-    }
+    });
   }
   res.statusCode = 201;
   return res.end();
-};
-
-const insertNoteAsync = async (body: NoteBody, db: Db) => {
-  return new Promise((resolve, reject) => {
-    return db.collection('notes').insertOne(body, (err) => {
-      if (err) {
-        return reject(err.code);
-      }
-      return resolve({});
-    });
-  });
-};
-
-const updateNoteAsync = async (body: NoteBody, db: Db) => {
-  return new Promise((resolve, reject) => {
-    return db.collection('notes').updateOne(
-      {
-        _id: body._id,
-      },
-      {
-        $set: body,
-      },
-      (err) => {
-        if (err) {
-          return reject(err.code);
-        }
-        return resolve({});
-      }
-    );
-  });
 };

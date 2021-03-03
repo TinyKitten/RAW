@@ -1,40 +1,33 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '../../../utils/mongodb';
+import { getRedisClient } from '../../../utils/redis';
 
 type NoteFetchError = {
-  error: number;
+  error: string;
 };
 
-export default async (
+export default (
   req: NextApiRequest,
   res: NextApiResponse<string | NoteFetchError>
-): Promise<void> => {
-  try {
-    const { db } = await connectToDatabase();
-    const note = await db.collection('notes').findOne({
-      _id: req.query.id,
-    });
+): void => {
+  const client = getRedisClient();
+  client.get(req.query.id as string, (err, note) => {
+    if (err) {
+      res.statusCode = 500;
+      return res.end();
+    }
     if (!note) {
       res.statusCode = 404;
-      res.json({
-        error: 404,
-      });
-      return;
+      return res.end();
     }
-    if (isJson(note.content)) {
+    if (isJson(note)) {
       res.statusCode = 200;
-      res.json(note.content);
+      res.json(note);
     } else {
       res.writeHead(200, { 'Content-Type': 'text/plain;charset=UTF-8' });
-      res.write(note.content);
+      res.write(note);
       res.end();
     }
-  } catch (err) {
-    res.statusCode = 500;
-    res.json({
-      error: err.code,
-    });
-  }
+  });
 };
 
 const isJson = (str: string) => {

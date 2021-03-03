@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import fetch from 'unfetch';
-import { NoteBody } from './api/notes';
 import useRandomId from '../hooks/randomId';
+import { NoteBody } from '../models/NoteBody';
 
 export default function Home(): React.ReactElement {
-  const _id = useRandomId();
+  const id = useRandomId();
   const [content, setContent] = useState('');
   const [wrote, setWrote] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -20,7 +20,7 @@ export default function Home(): React.ReactElement {
       }
       const result = await fetch('/api/notes', {
         method: 'POST',
-        body: JSON.stringify({ _id, content } as NoteBody),
+        body: JSON.stringify({ id, content } as NoteBody),
       });
       if (result.ok) {
         setHasError(false);
@@ -29,7 +29,7 @@ export default function Home(): React.ReactElement {
         setHasError(true);
       }
     },
-    [content, _id]
+    [content, id]
   );
 
   return (
@@ -37,8 +37,8 @@ export default function Home(): React.ReactElement {
       {wrote && (
         <p style={{ fontWeight: 'bold' }}>
           Your Path:{' '}
-          <a target="_blank" rel="noreferrer" href={`/api/raw/${_id}`}>
-            /api/raw/{_id}
+          <a target="_blank" rel="noreferrer" href={`/api/raw/${id}`}>
+            /api/raw/{id}
           </a>
         </p>
       )}
