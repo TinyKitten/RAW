@@ -2,14 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { NoteBody } from '../../../models/NoteBody';
 import { getRedisClient } from '../../../utils/redis';
 
-type NoteCreateError = {
-  error: string;
-};
-
-export default (
-  req: NextApiRequest,
-  res: NextApiResponse<NoteCreateError>
-): void => {
+export default (req: NextApiRequest, res: NextApiResponse): void => {
   if (req.method === 'POST') {
     const client = getRedisClient();
     const bodyJson = JSON.parse(req.body) as NoteBody;

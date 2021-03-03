@@ -1,14 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getRedisClient } from '../../../utils/redis';
 
-type NoteFetchError = {
-  error: string;
-};
-
-export default (
-  req: NextApiRequest,
-  res: NextApiResponse<string | NoteFetchError>
-): void => {
+export default (req: NextApiRequest, res: NextApiResponse<string>): void => {
   const client = getRedisClient();
   client.get(req.query.id as string, (err, note) => {
     if (err) {
